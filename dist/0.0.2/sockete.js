@@ -214,23 +214,27 @@ var Sockete = (function () {
     // Client API
     request: function (request, callback) {
       var response;
+      switch(request.request_type) {
+        case 'open': // should let client open connection
+          response = new Sockete.Response(request.client, 'open');
+          Sockete.logRound(this, request, response)
+          callback( response );
+        break;
+        case 'close': // should let client open connection
+          response = new Sockete.Response(request.client, 'close');
+          Sockete.logRound(this, request, response)
+          callback( response );
+        break;
+      }
       if (responder = this.findResponder(request)) {
         response = responder.response(request);
-      } else {
-        switch(request.request_type) {
-         case 'open': // should let client open connection
-          response = new Sockete.Response(request.client, 'open');
-         break;
-         case 'close': // should let client open connection
-           response = new Sockete.Response(request.client, 'close');
-         break;
-         default:
-          response = new Sockete.Response(request.client, 'close', '[Sockete.Server] No response configured for ' + request.toString());
-         break;
-        }
+        Sockete.logRound(this, request, response)
+        callback( response );
+      } else if (request.request_type !== 'open' && request.request_type !== 'close') {
+        response = new Sockete.Response(request.client, 'close', '[Sockete.Server] No response configured for ' + request.toString());
+        Sockete.logRound(this, request, response)
+        callback( response );
       }
-      Sockete.logRound(this, request, response)
-      callback( response );
     },
 
     // URL matching
