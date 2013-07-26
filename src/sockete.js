@@ -1,12 +1,17 @@
 var Sockete = (function () {
-  
+
   function log_enabled () {
     return window['console'] && Sockete.settings.log;
   }
-  
+
+  var origWebsocket = window['WebSocket'];
+
   return {
     mock: function () {
       window['WebSocket'] = Sockete.Client;
+    },
+    restore: function () {
+      window['WebSocket'] = origWebsocket;
     },
     logEvent: function(evt) {
       if(!log_enabled()) return false;
