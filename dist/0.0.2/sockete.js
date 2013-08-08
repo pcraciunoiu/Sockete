@@ -121,8 +121,22 @@ var Sockete = (function () {
     function dispatch (response) {
       // Store history here, or something
       switch(response.type) {
-        case 'open': readyState(1); break;
-        case 'close': readyState(3); break;
+        case 'open':
+          readyState(1);
+          self['onopen']({
+            eventPhase: 1,
+            timeStamp: new Date().getTime()
+          });
+          return;
+        case 'close':
+          readyState(3);
+          self['onclose']({
+            code: 1000,  // normal websocket close code
+            eventPhase: 3,
+            reason: "",
+            timeStamp: new Date().getTime()
+          });
+          return;
       }
       self['on'+response.type](response);
     }
